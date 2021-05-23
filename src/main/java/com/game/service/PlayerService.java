@@ -146,34 +146,14 @@ public class PlayerService {
         return 50 * (player.getLevel() + 1) * (player.getLevel() + 2) - player.getExperience();
     }
 
-    /**
-     * создать пользователя
-     *
-     * Мы не можем создать игрока, если:
-     * - указаны не все параметры из Data Params (кроме banned);
-     * - длина значения параметра “name” или “title” превышает размер соответствующего поля в БД (12 и 30 символов);
-     * - значение параметра “name” пустая строка;
-     * - опыт находится вне заданных пределов;
-     * - “birthday”:[Long] < 0;
-     * - дата регистрации находятся вне заданных пределов.
-     * В случае всего вышеперечисленного необходимо ответить ошибкой с кодом 400.
-     */
-
     public Player createPlayer(Player player) {
 
-        // проверяем все ли параметры указаны
         if (isValidParams(player)
-                // проверяем длину значений имени,
                 && isValidName(player.getName())
-                // титула
                 && isValidTitle(player.getTitle())
-                // проверяем, что опыт не находится вне заданных пределов
                 && isValidExperience(player.getExperience())
-                // проверяем, что дата регистрации не находятся вне заданных пределов
                 && isValidDate(player.getBirthday())) {
 
-            // высчитываем текущий уровень персонажа
-            // и опыт необходимый для достижения следующего уровня
             player.setLevel(calculateLevel(player));
             player.setUntilNextLevel(calculateUntilNextLevel(player));
 
@@ -184,28 +164,18 @@ public class PlayerService {
         }
     }
 
-    /**
-     * редактировать характеристики существующего игрока
-     *
-     * Обновлять нужно только те поля, которые не null.
-     * Если игрок не найден в БД, необходимо ответить ошибкой с кодом 404.
-     * Если значение id не валидное, необходимо ответить ошибкой с кодом 400.
-     */
     public Player updatePlayer(Long id, Player player) {
 
-        // Если значение id не валидное, необходимо ответить ошибкой с кодом 400.
         if (id <= 0) {
             throw new BadRequestException();
         }
 
-        // Если игрок не найден в БД, необходимо ответить ошибкой с кодом 404.
         if (!playerRepository.existsById(id)) {
             throw new PlayerNotFoundException();
         }
 
         Player changedPlayer = playerRepository.findById(id).get();
 
-        // Обновлять нужно только те поля, которые не null
         if (player.getName() != null) {
             changedPlayer.setName(player.getName());
         }
@@ -244,12 +214,6 @@ public class PlayerService {
         return playerRepository.save(changedPlayer);
     }
 
-    /**
-     * удалять игрока
-     *
-     * Если игрок не найден в БД, необходимо ответить ошибкой с кодом 404.
-     * Если значение id не валидное, необходимо ответить ошибкой с кодом 400.
-     */
     public void deleteById(Long id) {
 
         if (id <= 0) {
@@ -263,32 +227,18 @@ public class PlayerService {
         playerRepository.deleteById(id);
     }
 
-    /**
-     * получать игрока по id
-     *
-     * Если игрок не найден в БД, необходимо ответить ошибкой с кодом 404.
-     * Если значение id не валидное, необходимо ответить ошибкой с кодом 400.
-     */
     public Player findById(Long id) {
 
-        // Если значение id не валидное, необходимо ответить ошибкой с кодом 400.
         if (id <= 0) {
             throw new BadRequestException();
         }
 
-        // Если игрок не найден в БД, необходимо ответить ошибкой с кодом 404.
         if (!playerRepository.existsById(id)) {
             throw new PlayerNotFoundException();
         }
 
         return playerRepository.findById(id).get();
     }
-
-    /**
-     * сортировка списка в соответсвии с переданным параметром
-     *
-     * получать отфильтрованный список игроков в соответствии с переданными фильтрами
-     */
 
     public List<Player> sortPlayers(List<Player> list, PlayerOrder order) {
         if (order != null) {
@@ -311,23 +261,11 @@ public class PlayerService {
         return list;
     }
 
-    /**
-     * сортировка страницы в соответсвии с переданными параметрами
-     *
-     * pageNumber – параметр, который отвечает за номер отображаемой страницы при использовании пейджингаъ
-     * pageSize – параметр, который отвечает за количество результатов на одной странице при пейджинге
-     */
-
     public List<Player> sortPage(List<Player> list, Integer pageNumber, Integer pageSize) {
 
-        // start = номер отображаемой страницы (0)
-        // * количество результатов на одной странице (3)
-        int start = pageNumber * pageSize; // 0 * 3 = 0
+        int start = pageNumber * pageSize;
+        int end = start + pageSize;
 
-        // end = start + количество результатов на одной странице
-        int end = start + pageSize; // 0 + 3 = 3
-
-        //
         if (end > list.size())
             end = list.size();
 

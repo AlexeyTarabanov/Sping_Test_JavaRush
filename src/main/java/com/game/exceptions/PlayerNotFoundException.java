@@ -7,4 +7,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 // код ответа сервера, который сообщает пользователю, что сервер не может найти запрашиваемые данные
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class PlayerNotFoundException extends RuntimeException {
+
+    public PlayerNotFoundException() {}
+
+    public PlayerNotFoundException(String message) {
+        super(message);
+    }
 }

@@ -5,7 +5,6 @@ import com.game.entity.Profession;
 import com.game.entity.Race;
 import com.game.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,8 +19,6 @@ import java.util.List;
  */
 
 @RestController
-// пометим аннотацией @RequestMapping
-// (так как все адреса в нашем контроллере будут начинаться с «/rest»
 @RequestMapping("/rest")
 public class PlayerController {
 
@@ -30,14 +27,7 @@ public class PlayerController {
     public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
     }
-
-    // 1. получать список всех зарегистрированных игроков
-    // @GetMapping будет "/players", так как адрес этого метода "/rest/players"
-    // набрав "/rest/players" и сделав GET запрос мы попадем в этот метод
     @GetMapping("/players")
-    // required = false,
-    // если мы передаем в get запросе эти параметры, то эти параметры внедряются в эти переменны (name, title и т.д.)
-    // если же мы в нашем запросе НЕ пишем эти параметры в url, то в этих переменных будет лежать null
     public List<Player> getPlayersList(@RequestParam(value = "name", required = false) String name,
                                        @RequestParam(value = "title", required = false) String title,
                                        @RequestParam(value = "race", required = false) Race race,
@@ -87,7 +77,6 @@ public class PlayerController {
     }
 
     // 5. получать игрока по id;
-    // с помощью аннотации @PathVariable мы извлечем этот id из url и получим к нему доступ внутри этого метода
     @GetMapping ("players/{id}")
     public Player getPlayer(@PathVariable(value = "id") Long id) {
         return playerService.findById(id);
